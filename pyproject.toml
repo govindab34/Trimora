@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trimora"
+version = "1.0.0"
+description = "AI-powered FASTQ quality control and trimming tool using local LLMs"
+authors = [
+    {name = "Govind Mangropa", email = "govind@molynexlab.org"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+keywords = ["bioinformatics", "fastq", "quality-control", "trimming", "ai", "sequencing"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "requests>=2.25.0",
+    "rich>=10.0.0",
+]
+
+[project.scripts]
+trimora = "trimora.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/govindab34/trimora"
+Repository = "https://github.com/govindab34/trimora"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["trimora*"]
