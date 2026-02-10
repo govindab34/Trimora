@@ -92,6 +92,100 @@ def check_ollama_running() -> bool:
         return False
 
 
+def install_ollama() -> bool:
+    """
+    Automatically install Ollama.
+    
+    Returns:
+        True if installation successful, False otherwise
+    """
+    import platform
+    
+    system = platform.system().lower()
+    
+    print("📥 Ollama not found. Installing automatically...")
+    
+    try:
+        if system == "linux":
+            # Linux installation
+            print("  Downloading Ollama for Linux...")
+            result = subprocess.run(
+                ["curl", "-fsSL", "https://ollama.com/install.sh"],
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+            
+            if result.returncode == 0:
+                # Run the install script
+                install_process = subprocess.run(
+                    ["sh", "-c", result.stdout],
+                    capture_output=True,
+                    text=True,
+                    timeout=300
+                )
+                
+                if install_process.returncode == 0:
+                    print("  ✅ Ollama installed successfully!")
+                    return True
+                else:
+                    print(f"  ⚠️ Installation failed: {install_process.stderr}")
+                    return False
+        
+        elif system == "darwin":  # macOS
+            print("  Please install Ollama using: brew install ollama")
+            print("  Or download from: https://ollama.com/download")
+            return False
+        
+        else:  # Windows
+            print("  Please download Ollama from: https://ollama.com/download")
+            return False
+            
+    except Exception as e:
+        print(f"  ❌ Auto-installation failed: {e}")
+        print("  Please install manually from: https://ollama.com/download")
+        return False
+
+
+def start_ollama_service() -> bool:
+    """
+    Start Ollama service in the background.
+    
+    Returns:
+        True if started successfully, False otherwise
+    """
+    import time
+    
+    # Check if already running
+    if check_ollama_running():
+        return True
+    
+    print("🚀 Starting Ollama service...")
+    
+    try:
+        # Start Ollama in background
+        subprocess.Popen(
+            ["ollama", "serve"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True
+        )
+        
+        # Wait for it to start (up to 10 seconds)
+        for i in range(10):
+            time.sleep(1)
+            if check_ollama_running():
+                print("  ✅ Ollama service started!")
+                return True
+        
+        print("  ⚠️ Ollama started but not responding yet. Please wait a moment.")
+        return False
+        
+    except Exception as e:
+        print(f"  ❌ Failed to start Ollama: {e}")
+        return False
+
+
 def check_ollama_model(model_name: str = "llama3:8b") -> bool:
     """
     Check if a specific Ollama model is available.

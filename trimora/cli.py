@@ -146,28 +146,52 @@ Author: Govind Mangropa, Molynex Lab
     
     # Check Ollama service
     console.print("[bold]🤖 Checking Ollama service...[/bold]")
-    if not check_ollama_running():
-        console.print("[bold red]❌ Ollama is not running[/bold red]")
-        console.print("\nPlease start Ollama:")
-        console.print("  [cyan]ollama serve[/cyan]\n")
-        sys.exit(1)
     
-    console.print("[green]✅ Ollama is running[/green]\n")
+    # First check if Ollama command exists
+    if not deps["ollama"]:
+        console.print("[yellow]⚠️  Ollama not found. Attempting automatic installation...[/yellow]\n")
+        
+        from .utils import install_ollama
+        if install_ollama():
+            console.print("[green]✅ Ollama installed successfully![/green]\n")
+        else:
+            console.print("[bold red]❌ Automatic installation failed[/bold red]")
+            console.print("\nPlease install Ollama manually:")
+            console.print("  Linux: [cyan]curl -fsSL https://ollama.com/install.sh | sh[/cyan]")
+            console.print("  macOS: [cyan]brew install ollama[/cyan]")
+            console.print("  Website: [cyan]https://ollama.com/download[/cyan]\n")
+            sys.exit(1)
+    
+    # Check if service is running, if not start it
+    from .utils import check_ollama_running, start_ollama_service
+    
+    if not check_ollama_running():
+        console.print("[yellow]⚠️  Ollama service not running. Starting automatically...[/yellow]")
+        if start_ollama_service():
+            console.print("[green]✅ Ollama service started[/green]\n")
+        else:
+            console.print("[bold red]❌ Failed to start Ollama service[/bold red]")
+            console.print("\nPlease start Ollama manually:")
+            console.print("  [cyan]ollama serve &[/cyan]\n")
+            sys.exit(1)
+    else:
+        console.print("[green]✅ Ollama is running[/green]\n")
     
     # Check/install model
     console.print(f"[bold]📦 Checking for model: {args.model}...[/bold]")
     if not check_ollama_model(args.model):
         console.print(f"[yellow]⚠️  Model {args.model} not found[/yellow]")
+        console.print(f"[bold]📥 Downloading {args.model} automatically...[/bold]")
+        console.print("[dim]This may take several minutes (model is ~4.7GB)[/dim]\n")
         
-        if console.input(f"Would you like to download {args.model}? (y/n): ").lower() == 'y':
-            if not install_ollama_model(args.model):
-                console.print("[bold red]❌ Failed to install model[/bold red]")
-                sys.exit(1)
-        else:
-            console.print("[bold red]❌ Model required to proceed[/bold red]")
+        if not install_ollama_model(args.model):
+            console.print("[bold red]❌ Failed to download model[/bold red]")
+            console.print(f"\nPlease download manually:")
+            console.print(f"  [cyan]ollama pull {args.model}[/cyan]\n")
             sys.exit(1)
-    
-    console.print(f"[green]✅ Model {args.model} available[/green]\n")
+        console.print(f"[green]✅ Model {args.model} ready![/green]\n")
+    else:
+        console.print(f"[green]✅ Model {args.model} available[/green]\n")
     
     # Load custom prompt if specified
     prompt_template = None
