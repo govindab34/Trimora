@@ -29,8 +29,24 @@ Author: **Govind Mangropa** | Molynex Lab
 
 ### Installation
 
+**From PyPI (when published):**
+
 ```bash
 pip install trimora
+```
+
+**Or install directly from GitHub:**
+
+```bash
+pip install git+https://github.com/govindab34/Trimora.git
+```
+
+**Or clone and install:**
+
+```bash
+git clone https://github.com/govindab34/Trimora.git
+cd Trimora
+pip install -e .
 ```
 
 ### Basic Usage
